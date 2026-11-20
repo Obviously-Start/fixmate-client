@@ -1,3 +1,8 @@
+export interface StatusHistoryItem {
+  status: string;
+  changedAt: string;
+}
+
 export interface Service {
   _id: string;
   title: string;
@@ -34,6 +39,7 @@ export interface Booking {
   status: string;
   finalAmount: number;
   paymentStatus: "unpaid" | "paid";
+  statusHistory?: StatusHistoryItem[];
   createdAt: string;
 }
 
@@ -57,4 +63,11 @@ export interface AppUser {
   image?: string;
   role: string;
   createdAt: string;
+}
+
+export interface Pagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
 }
