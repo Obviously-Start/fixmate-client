@@ -9,7 +9,7 @@ export function clearTokenCache() {
   cached = null;
 }
 
-// Client er nijer /api/token route theke JWT ane
+
 async function getToken() {
   if (cached && cached.expires > Date.now()) return cached.token;
   const res = await fetch("/api/token", { credentials: "include" });
@@ -19,7 +19,7 @@ async function getToken() {
   return token as string;
 }
 
-// Protected API call (Authorization: Bearer token)
+
 export async function apiFetch<T = any>(path: string, options: RequestInit = {}): Promise<T> {
   const token = await getToken();
   const res = await fetch(`${API_URL}${path}`, {
@@ -35,7 +35,7 @@ export async function apiFetch<T = any>(path: string, options: RequestInit = {})
   return json as T;
 }
 
-// Dashboard page er data load korar hook
+
 export function useFetch<T>(path: string) {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);

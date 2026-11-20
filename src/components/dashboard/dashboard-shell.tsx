@@ -46,7 +46,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
   const allowed =
     pathname === "/dashboard" || pathname.startsWith("/dashboard/profile") || pathname.startsWith(`/dashboard/${role}`);
 
-  // Session load hoyar por-i redirect hobe, tai reload korle login e pathabe na
+  
   useEffect(() => {
     if (isPending) return;
     if (!session) router.replace(`/sign-in?redirect=${encodeURIComponent(pathname)}`);

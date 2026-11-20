@@ -17,7 +17,6 @@ function SignInForm() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
 
-  // Je page e jete chaichhilo sekhane, nahole nijer dashboard e
   const raw = params.get("redirect") || "/dashboard";
   const redirectTo = raw.startsWith("/") && !raw.startsWith("//") ? raw : "/dashboard";
 
