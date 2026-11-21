@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FixMate Server
 
-## Getting Started
+Express + MongoDB REST API for FixMate, the smart device and home appliance repair booking platform.
 
-First, run the development server:
+- Live API:https://fixmateah.netlify.app
+
+- Client repository:https://github.com/Obviously-Start/fixmate-client.git
+- Live site: https://fixmate20.netlify.app
+
+
+
+## Key Features
+
+- JWT verification with role middlewares: `verifyToken`, `verifyCustomer`, `verifyTechnician`, `verifyAdmin` (401 for missing or invalid token, 403 for wrong role)
+- Users can only reach their own data; owner checks on every booking and service
+- Server-enforced job status pipeline with atomic updates and a `statusHistory` timeline
+- Payment gate: only a completed, unpaid booking owned by the customer can be paid
+- Stripe Checkout session, success-page verification and webhook, with unique indexes so a payment is never saved twice
+- Server-side search, filter, sort and pagination on services
+- Admin APIs for users, service approval, bookings, payments and dashboard stats
+
+## API Overview
+
+| Area | Endpoints |
+|---|---|
+| Services (public) | `GET /api/services`, `GET /api/services/featured`, `GET /api/services/:id` |
+| Services (technician) | `GET /api/services/my`, `POST /api/services`, `PATCH /api/services/:id`, `PATCH /api/services/:id/availability`, `DELETE /api/services/:id` |
+| Bookings (customer) | `POST /api/bookings`, `GET /api/bookings/my`, `PATCH /api/bookings/:id/cancel` |
+| Bookings (technician) | `GET /api/bookings/technician`, `PATCH /api/bookings/:id/status` |
+| Payments | `POST /api/payments/create-checkout-session`, `GET /api/payments/verify`, `GET /api/payments/my`, `POST /api/payments/webhook` |
+| Admin | `GET /api/admin/stats`, `/users`, `PATCH /users/:id/role`, `/services`, `PATCH /services/:id/approval`, `/bookings`, `/payments` |
+| Profile | `PATCH /api/users/profile` |
+
+## npm Packages
+
+`express`, `cors`, `dotenv`, `mongodb`, `jsonwebtoken`, `stripe`, `serverless-http`
+
+## Run Locally
 
 ```bash
+npm install
+
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Environment Variables (`.env`)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Name | Purpose |
+|---|---|
+| `PORT` | Local port (default 5000) |
+| `MONGODB_URI`, `DB_NAME` | MongoDB connection (same database as the client) |
+| `JWT_SECRET` | Must match the client `JWT_SECRET` |
+| `STRIPE_SECRET_KEY` | Stripe test secret key |
+| `STRIPE_WEBHOOK_SECRET` | Signing secret of the deployed webhook endpoint |
+| `CLIENT_URL` | Allowed CORS origin(s), comma separated |
+| `SITE_URL` | Client URL used for Stripe success and cancel redirects |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Deployment (Netlify)
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The Express app runs as a Netlify Function (`netlify/functions/api.js`) and all routes are redirected to it from `netlify.toml`. Add the production client domain to `CLIENT_URL`, and add the webhook endpoint `https://fixmateah.netlify.app
+/api/payments/webhook` (event `checkout.session.completed`) in the Stripe Dashboard in test mode.
